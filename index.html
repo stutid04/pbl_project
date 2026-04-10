@@ -1,255 +1,761 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PBL Presentation | 2026</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { background-color: #020617; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gradient-text { background: linear-gradient(90deg, #60a5fa, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* TIMER UI - FIXED CONTRAST */
-        #timerContainer { background: #ffffff; color: #020617; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 3px solid #3b82f6; z-index: 1000; }
-        @keyframes flicker { 0%, 100% { background-color: #ffffff; } 50% { background-color: #fca5a5; } }
-        .timer-warning { animation: flicker 1s infinite; border: 3px solid #ef4444 !important; color: #b91c1c !important; }
-        .timer-stop { background-color: #991b1b !important; color: #ffffff !important; border: 3px solid #f87171 !important; animation: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack AI | PBL 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #020617;
+    --panel:   #0f172a;
+    --card:    #1e293b;
+    --blue:    #3b82f6;
+    --purple:  #a855f7;
+    --green:   #22c55e;
+    --amber:   #f59e0b;
+    --white:   #f8fafc;
+    --muted:   #94a3b8;
+    --dim:     #475569;
+    --border:  rgba(255,255,255,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  /* ── TIMER ── */
+  #timerContainer {
+    background: #ffffff;
+    color: #020617;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    border: 3px solid #3b82f6;
+    z-index: 1000;
+  }
+  @keyframes flicker { 0%,100%{background:#fff} 50%{background:#fca5a5} }
+  .timer-warning { animation: flicker 1s infinite; border-color: #ef4444 !important; color: #b91c1c !important; }
+  .timer-stop    { background: #991b1b !important; color: #fff !important; border-color: #f87171 !important; animation: none; }
+
+  /* ── NAV ── */
+  .glass {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* ── GRADIENT TEXT ── */
+  .grad-blue   { background: linear-gradient(90deg,#60a5fa,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-purple { background: linear-gradient(90deg,#a855f7,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-green  { background: linear-gradient(90deg,#22c55e,#16a34a); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-amber  { background: linear-gradient(90deg,#f59e0b,#d97706); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-mix    { background: linear-gradient(90deg,#60a5fa,#a855f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+  /* ── SECTION LABELS ── */
+  .label {
+    display: inline-block;
+    padding: 3px 14px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    border: 1px solid;
+    margin-bottom: 1.2rem;
+  }
+  .label-blue   { color: #60a5fa; border-color: #3b82f640; background: #3b82f610; }
+  .label-purple { color: #c084fc; border-color: #a855f740; background: #a855f710; }
+  .label-green  { color: #4ade80; border-color: #22c55e40; background: #22c55e10; }
+  .label-amber  { color: #fcd34d; border-color: #f59e0b40; background: #f59e0b10; }
+
+  /* ── CARD BASE ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.14); }
+  .card-blue   { border-left: 3px solid #3b82f6; }
+  .card-purple { border-left: 3px solid #a855f7; }
+  .card-green  { border-left: 3px solid #22c55e; }
+  .card-amber  { border-left: 3px solid #f59e0b; }
+  .card-blue-r   { border-right: 3px solid #3b82f6; border-left: none; }
+  .card-purple-r { border-right: 3px solid #a855f7; border-left: none; }
+
+  /* ── STAT CALLOUT ── */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.2rem 1.5rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: #0f172a;
+    border: 1.5px dashed #3b82f6;
+    border-radius: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .img-placeholder::before,
+  .img-placeholder::after {
+    content: '';
+    position: absolute;
+    width: 22px; height: 22px;
+    border-color: #3b82f6;
+    border-style: solid;
+  }
+  .img-placeholder::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+  .img-placeholder::after  { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+  .img-placeholder:hover { border-color: #60a5fa; background: #1e293b; }
+  .img-placeholder .ph-icon { font-size: 2rem; opacity: .5; }
+  .img-placeholder .ph-label {
+    font-size: .75rem;
+    font-weight: 700;
+    color: #60a5fa;
+    text-align: center;
+    padding: 0 1.5rem;
+    line-height: 1.4;
+  }
+  .img-placeholder .ph-sub {
+    font-size: .65rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 0 1.5rem;
+    font-style: italic;
+  }
+
+  /* ── FLOW STEP ── */
+  .flow-step {
+    border: 1px solid;
+    border-radius: .6rem;
+    padding: .5rem 1rem;
+    font-size: .8rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: .03em;
+  }
+
+  /* ── TECH ITEM ── */
+  .tech-item {
+    display: flex; align-items: flex-start; gap: .7rem;
+    padding: .6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tech-dot {
+    width: 4px; min-width: 4px;
+    height: 2.2rem;
+    border-radius: 2px;
+    margin-top: 2px;
+  }
+
+  /* ── FEATURE CARD ── */
+  .feat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.2rem;
+    padding: 1.4rem;
+    transition: transform .2s, border-color .2s;
+  }
+  .feat-card:hover { transform: translateY(-3px); }
+
+  /* ── METRIC BOX ── */
+  .metric-box {
+    border-radius: 1rem;
+    padding: 1.2rem 1rem;
+    border: 1px solid;
+    text-align: center;
+  }
+
+  /* ── FUTURE CARD ── */
+  .future-card {
+    border: 1px solid;
+    border-radius: 1rem;
+    padding: 1.1rem 1.2rem;
+    display: flex; gap: .9rem; align-items: flex-start;
+    transition: transform .2s;
+  }
+  .future-card:hover { transform: translateY(-2px); }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+  /* ── SECTION SPACING ── */
+  section { padding: 5rem 0; }
+  section + section { padding-top: 0; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .fade-up { animation: fadeUp .6s ease both; }
+  .fade-up-1 { animation-delay: .1s; }
+  .fade-up-2 { animation-delay: .2s; }
+  .fade-up-3 { animation-delay: .3s; }
+  .fade-up-4 { animation-delay: .4s; }
+  .fade-up-5 { animation-delay: .5s; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius:3px; }
+</style>
 </head>
 <body onload="startTimer()">
 
-    <div id="timerContainer" class="fixed bottom-10 right-10 px-8 py-4 rounded-3xl flex items-center gap-4 transition-all">
-        <i class="fas fa-hourglass-start text-blue-600 text-2xl" id="timerIcon"></i>
-        <span id="displayTime" class="text-4xl font-black font-mono tracking-tighter">00:00</span>
+<!-- ── TIMER ─────────────────────────────────────── -->
+<div id="timerContainer" class="fixed bottom-8 right-8 px-7 py-3 rounded-3xl flex items-center gap-3 transition-all">
+  <i class="fas fa-hourglass-start text-blue-600 text-xl" id="timerIcon"></i>
+  <span id="displayTime" class="text-3xl font-black font-mono tracking-tighter">00:00</span>
+</div>
+
+<!-- ── NAV ───────────────────────────────────────── -->
+<nav class="fixed w-full z-50 glass border-b border-slate-800/50 px-8 py-3 flex justify-between items-center">
+  <div class="flex items-center gap-4">
+    <div class="bg-white p-1 rounded flex items-center justify-center shadow-md" style="height:42px;width:42px;">
+      <img src="mujlogo.jpg" alt="MUJ" class="h-full w-auto object-contain" onerror="this.src='https://via.placeholder.com/42?text=MUJ'">
+    </div>
+    <div class="flex flex-col text-left">
+      <span class="text-lg font-black text-white leading-none uppercase tracking-tighter">PBL <span class="text-blue-500 italic">2026</span></span>
+      <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Dept. of Computer Science & Engineering</span>
+    </div>
+  </div>
+  <div class="hidden md:flex gap-7 text-[10px] uppercase tracking-widest font-bold opacity-60">
+    <a href="#hero"         class="hover:text-blue-400 transition">Home</a>
+    <a href="#problem"      class="hover:text-blue-400 transition">Problem</a>
+    <a href="#methodology"  class="hover:text-blue-400 transition">Methodology</a>
+    <a href="#features"     class="hover:text-blue-400 transition">Features</a>
+    <a href="#results"      class="hover:text-blue-400 transition">Results</a>
+    <a href="#screenshots"  class="hover:text-blue-400 transition">Screenshots</a>
+    <a href="#future"       class="hover:text-blue-400 transition">Future</a>
+  </div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-6 pt-28 pb-32 space-y-32">
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 1 · TITLE                               -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="hero" class="min-h-[88vh] flex flex-col justify-center">
+    <div class="inline-block px-4 py-1 border border-slate-800 rounded-full text-slate-500 text-[10px] font-mono mb-6 uppercase tracking-widest fade-up">
+      ID: 23FE10CSE00137
+    </div>
+    <h1 class="text-5xl md:text-7xl font-extrabold mb-6 uppercase leading-tight fade-up fade-up-1">
+      <span class="grad-mix">AI-Based Personal<br>Finance Tracker</span><br>
+      <span class="text-white">and Budget</span> <span class="grad-purple">Recommender</span>
+    </h1>
+    <p class="text-slate-400 max-w-2xl italic text-base leading-relaxed border-l-2 border-blue-500/40 pl-5 mb-12 fade-up fade-up-2">
+      "The objective of this project is to develop an AI-powered personal finance management system that not only tracks user transactions but also analyzes spending behavior and predicts future budgets using machine learning techniques."
+    </p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 2 · PROBLEM STATEMENT                   -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="problem">
+    <span class="label label-blue">Problem Statement</span>
+    <h2 class="text-4xl font-black mb-10 leading-tight">Problem<br><span class="grad-blue">Statement</span></h2>
+
+    <div class="grid md:grid-cols-2 gap-8 items-stretch">
+      <!-- Left: Challenge -->
+      <div class="card card-blue p-8 flex flex-col justify-center">
+        <h3 class="text-lg font-bold text-blue-400 mb-4">The Challenge</h3>
+        <p class="text-slate-400 leading-relaxed text-sm text-justify mb-4">
+          With the rapid increase in digital financial transactions, individuals often find it difficult to monitor, control, and optimize their spending effectively. Existing personal finance tracking systems mainly provide transaction recording and basic visualization features but lack intelligent mechanisms to analyze historical spending patterns and predict future budget requirements.
+        </p>
+        <p class="text-slate-400 leading-relaxed text-sm text-justify mb-4">
+          As a result, budgeting remains manual, non-personalized, and reactive, increasing the risk of overspending.
+        </p>
+        <p class="text-slate-400 leading-relaxed text-sm text-justify">
+          Therefore, there is a need for a data-driven and intelligent financial management system that integrates machine learning techniques — specifically XGBoost regression — to provide optimized and personalized budget recommendations.
+        </p>
+      </div>
+
+      <!-- Right: Lit Review + Research Gap -->
+      <div class="space-y-6">
+        <div class="card card-blue-r p-7">
+          <h3 class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-3">Literature Review / Market Research</h3>
+          <ul class="text-sm text-slate-500 space-y-2">
+            <li>• Existing apps like Mint and Walnut focus on transaction recording and categorization only</li>
+            <li>• Dashboards and graphical visualization are the primary user-facing features</li>
+            <li>• ML models, especially Gradient Boosting (XGBoost), perform effectively in regression-based forecasting</li>
+            <li>• XGBoost handles structured datasets and captures complex non-linear spending trends</li>
+            <li>• Most current finance systems do not integrate advanced predictive models for budget recommendations</li>
+          </ul>
+        </div>
+        <div class="card card-purple-r p-7">
+          <h3 class="text-purple-400 font-bold text-xs uppercase tracking-widest mb-3">Research Gap / Innovation</h3>
+          <ul class="text-sm text-slate-500 space-y-2">
+            <li>• Most personal finance tools focus only on tracking and visualization</li>
+            <li>• Budget planning remains manual, reactive, and user-dependent</li>
+            <li>• Limited integration of machine learning in personal finance apps</li>
+            <li>• No analysis of historical patterns to predict future budget needs</li>
+            <li>• This project integrates XGBoost regression to generate intelligent, personalized budget recommendations</li>
+            <li>• Transforms a static tracker into a dynamic, data-driven financial decision-support system</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 3 · METHODOLOGY                         -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="methodology">
+    <span class="label label-purple">Methodology</span>
+    <h2 class="text-4xl font-black mb-10">System <span class="grad-purple">Methodology</span></h2>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+      <!-- Dataset -->
+      <div class="card card-amber p-8">
+        <i class="fas fa-database text-amber-400 text-2xl mb-4"></i>
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-amber-400">Dataset / Input</h3>
+        <ul class="text-sm text-slate-400 space-y-2 text-left">
+          <li>• <strong class="text-white">26,052</strong> transaction records</li>
+          <li>• <strong class="text-white">6</strong> key features per record</li>
+          <li>• Attributes: City, Date, Card Type, Expense Type, Gender, Amount</li>
+          <li>• <strong class="text-white">986</strong> cities · <strong class="text-white">4</strong> card types · <strong class="text-white">6</strong> categories</li>
+          <li>• No missing values — clean, consistent data</li>
+          <li>• Preprocessing: encoding, feature selection, pivot aggregation</li>
+        </ul>
+      </div>
+
+      <!-- Model / Architecture -->
+      <div class="card card-blue p-8">
+        <i class="fas fa-microchip text-blue-400 text-2xl mb-4"></i>
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-blue-400">Model / Architecture</h3>
+        <ul class="text-sm text-slate-500 space-y-1 mb-5">
+          <li>• Algorithm: <strong class="text-white">XGBoost Regressor</strong></li>
+          <li>• Predicts spend <em>ratio</em> (next ÷ current month)</li>
+          <li>• Handles non-linear financial patterns</li>
+          <li>• L1 &amp; L2 regularization prevents overfitting</li>
+          <li>• Safety clamp: 0.8× – 1.5× of current spend</li>
+        </ul>
+        <div class="flex flex-col items-center gap-1 text-xs font-semibold">
+          <div class="flow-step w-full border-blue-500/40 text-blue-300 bg-blue-500/10">Data Collection</div>
+          <div class="text-blue-400">↓</div>
+          <div class="flow-step w-full border-blue-500/40 text-blue-300 bg-blue-500/10">Preprocessing</div>
+          <div class="text-blue-400">↓</div>
+          <div class="flow-step w-full border-blue-500/40 text-blue-300 bg-blue-500/10">Feature Engineering</div>
+          <div class="text-blue-400">↓</div>
+          <div class="flow-step w-full border-green-500/40 text-green-300 bg-green-500/10">Model Training (XGBoost)</div>
+          <div class="text-blue-400">↓</div>
+          <div class="flow-step w-full border-green-500/60 text-green-200 bg-green-500/20">Budget Prediction</div>
+        </div>
+      </div>
+
+      <!-- Live Execution + Tech Stack -->
+      <div class="card card-green p-8">
+        <i class="fab fa-python text-green-400 text-2xl mb-4"></i>
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-green-400">Tech Stack</h3>
+        <div class="space-y-0">
+          <div class="tech-item">
+            <div class="tech-dot bg-blue-500"></div>
+            <div><p class="text-sm font-bold text-white">Streamlit</p><p class="text-xs text-slate-500">Web UI Framework</p></div>
+          </div>
+          <div class="tech-item">
+            <div class="tech-dot bg-green-500"></div>
+            <div><p class="text-sm font-bold text-white">XGBoost</p><p class="text-xs text-slate-500">Budget Prediction Model</p></div>
+          </div>
+          <div class="tech-item">
+            <div class="tech-dot bg-amber-500"></div>
+            <div><p class="text-sm font-bold text-white">Pandas / NumPy</p><p class="text-xs text-slate-500">Data Processing</p></div>
+          </div>
+          <div class="tech-item">
+            <div class="tech-dot bg-purple-500"></div>
+            <div><p class="text-sm font-bold text-white">Plotly</p><p class="text-xs text-slate-500">Interactive Charts</p></div>
+          </div>
+          <div class="tech-item">
+            <div class="tech-dot bg-blue-400"></div>
+            <div><p class="text-sm font-bold text-white">SQLite</p><p class="text-xs text-slate-500">Persistent Storage</p></div>
+          </div>
+          <div class="tech-item border-0">
+            <div class="tech-dot bg-purple-400"></div>
+            <div><p class="text-sm font-bold text-white">Hybrid AI Chatbot
+                 </p><p class="text-xs text-slate-500">Rule-Based + ML Insights</p></div>
+          </div>
+        </div>
+        <a href="https://ai-based-personal-finance-tracker-and-budget-recommender-ujpzg.streamlit.app/" target="_blank"
+           class="mt-5 block text-center px-4 py-2 bg-green-600 hover:bg-green-500 rounded-full text-xs font-black transition shadow-lg shadow-green-900/40">
+          🔗 VIEW LIVE DEMO
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 4 · KEY FEATURES                        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="features">
+    <span class="label label-green">Key Features</span>
+    <h2 class="text-4xl font-black mb-10">Application <span class="grad-green">Features</span></h2>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Feature cards -->
+      <div class="feat-card card-blue">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">🔐</span>
+          <h3 class="font-bold text-blue-400">User Authentication</h3>
+        </div>
+        <div class="divider" style="margin:.5rem 0 .8rem;"></div>
+        <ul class="text-sm text-slate-400 space-y-2">
+          <li>→ Secure signup &amp; login system</li>
+          <li>→ SHA-256 password encryption</li>
+          <li>→ Streamlit session management</li>
+          <li>→ User-scoped data isolation</li>
+        </ul>
+      </div>
+
+      <div class="feat-card card-purple">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">📊</span>
+          <h3 class="font-bold text-purple-400">Financial Tracking</h3>
+        </div>
+        <div class="divider" style="margin:.5rem 0 .8rem;"></div>
+        <ul class="text-sm text-slate-400 space-y-2">
+          <li>→ Log income &amp; expenses</li>
+          <li>→ 8 expense + 5 income categories</li>
+          <li>→ Inline edit &amp; delete transactions</li>
+          <li>→ Export transactions as CSV</li>
+        </ul>
+      </div>
+
+      <div class="feat-card card-amber">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">🤖</span>
+          <h3 class="font-bold text-amber-400">XGBoost Predictor</h3>
+        </div>
+        <div class="divider" style="margin:.5rem 0 .8rem;"></div>
+        <ul class="text-sm text-slate-400 space-y-2">
+          <li>→ Ratio-based spend prediction</li>
+          <li>→ Trained on 26,052 transactions</li>
+          <li>→ 0.8× – 1.5× safety bounds</li>
+          <li>→ No dummy feature bias</li>
+        </ul>
+      </div>
+
+      <div class="feat-card card-green">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">💬</span>
+          <h3 class="font-bold text-green-400">AI Chatbot</h3>
+        </div>
+        <div class="divider" style="margin:.5rem 0 .8rem;"></div>
+        <ul class="text-sm text-slate-400 space-y-2">
+          <li>→ Claude API integration</li>
+          <li>→ Fully data-driven responses</li>
+          <li>→ Rule-based fallback engine</li>
+          <li>→ Quick-prompt shortcuts</li>
+        </ul>
+      </div>
+
+      <div class="feat-card card-purple">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">📈</span>
+          <h3 class="font-bold text-purple-400">Data Visualizations</h3>
+        </div>
+        <div class="divider" style="margin:.5rem 0 .8rem;"></div>
+        <ul class="text-sm text-slate-400 space-y-2">
+          <li>→ Income vs expense bar charts</li>
+          <li>→ Expense breakdown donut</li>
+          <li>→ Spending heatmap by day</li>
+          <li>→ Daily trend + 7-day MA</li>
+        </ul>
+      </div>
+
+      <div class="feat-card card-blue">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">📋</span>
+          <h3 class="font-bold text-blue-400">Budget Intelligence</h3>
+        </div>
+        <div class="divider" style="margin:.5rem 0 .8rem;"></div>
+        <ul class="text-sm text-slate-400 space-y-2">
+          <li>→ Proportional category caps</li>
+          <li>→ Utilization gauge (0–150%)</li>
+          <li>→ Over-budget alerts in red</li>
+          <li>→ Category variance table</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 5 · RESULTS & MODEL PERFORMANCE         -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="results" class="bg-slate-900/60 rounded-3xl p-10 -mx-4">
+    <span class="label label-amber">Results & Analysis</span>
+    <h2 class="text-4xl font-black mb-8">Model Performance <span class="grad-amber">&amp; Application Output</span></h2>
+
+    <!-- Metrics row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div class="metric-box border-green-500/40 bg-green-500/10">
+        <div class="stat-num text-green-400">0.91</div>
+        <div class="text-xs font-bold text-white mt-1">R² Score</div>
+        <div class="text-xs text-slate-500">Model accuracy</div>
+      </div>
+      <div class="metric-box border-blue-500/40 bg-blue-500/10">
+        <div class="stat-num text-blue-400">26K</div>
+        <div class="text-xs font-bold text-white mt-1">Training Rows</div>
+        <div class="text-xs text-slate-500">Transaction records</div>
+      </div>
+      <div class="metric-box border-purple-500/40 bg-purple-500/10">
+        <div class="stat-num text-purple-400">10</div>
+        <div class="text-xs font-bold text-white mt-1">ML Features</div>
+        <div class="text-xs text-slate-500">Category + volume</div>
+      </div>
+      <div class="metric-box border-amber-500/40 bg-amber-500/10">
+        <div class="stat-num text-amber-400" style="font-size:1.8rem">0.8–1.5×</div>
+        <div class="text-xs font-bold text-white mt-1">Prediction Range</div>
+        <div class="text-xs text-slate-500">Safety bounds</div>
+      </div>
     </div>
 
-    <nav class="fixed w-full z-50 glass border-b border-slate-800/50 px-8 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <div class="bg-white p-1 rounded flex items-center justify-center shadow-md" style="height: 48px; width: 48px;">
-                <img src="mujlogo.jpg" alt="MUJ" class="h-full w-auto object-contain" onerror="this.src='https://via.placeholder.com/50?text=MUJ'">
-            </div>
-            <div class="flex flex-col text-left">
-                <span class="text-xl font-black text-white leading-none uppercase tracking-tighter">PBL <span class="text-blue-500 italic">2026</span></span>
-                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Dept. of Computer Science & Engineering</span>
-            </div>
+    <div class="grid md:grid-cols-2 gap-10 items-center">
+      <!-- Chart -->
+      <div class="h-72">
+        <canvas id="resultsChart"></canvas>
+      </div>
+      <!-- Right panel -->
+      <div class="space-y-5">
+        <div class="card p-6">
+          <span class="text-slate-400 uppercase text-xs tracking-widest">Model Performance</span>
+          <div class="text-blue-400 text-4xl font-black font-['Playfair_Display'] mt-1">R² Score: 0.91</div>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            The XGBoost Regressor achieved high predictive accuracy by sequentially minimizing residual errors. It effectively captures non-linear financial patterns and generates personalized monthly budgets anchored to each user's own spending scale.
+          </p>
         </div>
-        <div class="hidden md:flex gap-8 text-[11px] uppercase tracking-widest font-bold opacity-70">
-            <a href="#problem" class="hover:text-blue-400 transition">Problem</a>
-            <a href="#methodology" class="hover:text-blue-400 transition">Methodology</a>
-            <a href="#results" class="hover:text-blue-400 transition">Results</a>
-            <a href="#team" class="hover:text-blue-400 transition">Team</a>
+        <!-- image placeholder -->
+        <div class="img-placeholder h-44">
+          <span class="ph-icon">📷</span>
+          <span class="ph-label">[ Screenshot: Budget Predictor — Gauge + Category Table ]</span>
+          <span class="ph-sub">Budget utilization gauge and proportional allocation breakdown</span>
         </div>
-    </nav>
+      </div>
+    </div>
+  </section>
 
-    <main class="max-w-6xl mx-auto px-6 pt-48 pb-32 space-y-32">
-        
-        <section class="text-center">
-            <div class="inline-block px-4 py-1 border border-slate-800 rounded-full text-slate-500 text-[10px] font-mono mb-6 uppercase tracking-widest">ID: 23FE10CSE00137</div>
-            <h1 class="text-6xl md:text-7xl font-extrabold mb-8 uppercase leading-tight"><span class="gradient-text uppercase">AI-Based Personal Finance Tracker and Budget Recommender </span></h1>
-            <p class="text-slate-400 max-w-2xl mx-auto italic text-lg leading-relaxed border-l-2 border-blue-500/30 pl-6 text-left">
-                "Project Statement: "The primary objective of this project is to transform a traditional transaction-based finance tracker into an intelligent, data-driven system that provides optimized budget recommendations using machine learning."
-            </p>
-        </section>
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 6 · APP SCREENSHOTS                     -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="screenshots">
+    <span class="label label-purple">Application Screenshots</span>
+    <h2 class="text-4xl font-black mb-3">Application</h2>
+    <h2 class="text-4xl font-black mb-10"><span class="grad-purple">Screenshots &amp; Results</span></h2>
 
-        <section id="problem" class="grid md:grid-cols-2 gap-12 items-stretch">
-            <div class="glass p-10 rounded-[2.5rem] flex flex-col justify-center border-l-4 border-blue-600">
-                <h2 class="text-3xl font-extrabold mb-6">Problem Statement</h2>
-                <p class="text-slate-400 leading-relaxed text-justify">With the rapid increase in digital financial transactions, individuals often find it difficult to monitor, control, and optimize their spending effectively. Existing personal finance tracking systems mainly provide transaction recording and basic visualization features but lack intelligent mechanisms to analyze historical spending patterns and predict future budget requirements.As a result, budgeting remains manual, non-personalized, and reactive, increasing the risk of overspending. Therefore, there is a need for a data-driven and intelligent financial management system that integrates machine learning techniques to provide optimized and personalized budget recommendations.</p>
-            </div>
-            <div class="space-y-6">
-                <div class="glass p-7 rounded-3xl border-r-4 border-blue-500/50">
-                    <h3 class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-2">Literature Review / Market Research</h3>
-                    <ul class="text-sm text-slate-500 italic">
-                        <li>• Existing personal finance applications such as Mint and Walnut focus on transaction recording and expense categorization.</li>
-                        <li>• These systems provide dashboards and graphical visualization of spending patterns.</li>
-                        <li>• They primarily help users monitor financial activities through summary reports.</li>
-                        <li>• Research in financial analytics highlights that Machine Learning models, especially Gradient Boosting algorithms like XGBoost, perform effectively in regression-based forecasting.</li>
-                        <li>• XGBoost can handle structured datasets and capture complex, non-linear spending trends.</li>
-                        <li>• However, most current finance systems do not integrate advanced predictive models for personalized budget recommendations.</li>
-                    </ul>
-                </div>
-                <div class="glass p-7 rounded-3xl border-r-4 border-purple-500/50">
-                    <h3 class="text-purple-400 font-bold text-xs uppercase tracking-widest mb-2">Research Gap / Innovation</h3>
-                    <ul class="text-sm text-slate-500 italic">
-                        <li>• Most existing personal finance systems focus only on tracking and visualization.</li>
-                        <li>• Budget planning remains manual, reactive, and user-dependent.</li>
-                        <li>• There is limited integration of machine learning models in personal finance applications.</li>
-                        <li>• Current systems do not analyze historical spending patterns to predict future budget needs.</li>
-                        <li>• This project integrates an XGBoost regression model to generate intelligent and personalized budget recommendations.</li>
-                        <li>• The approach transforms a static tracker into a dynamic, data-driven financial decision-support system.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="img-placeholder h-60">
+        <span class="ph-icon">📷</span>
+        <span class="ph-label">[ Screenshot: Dashboard — KPI Cards + Charts ]</span>
+        <span class="ph-sub">Income, expense, savings, prediction cards + Income vs Expense chart</span>
+      </div>
+      <div class="img-placeholder h-60">
+        <span class="ph-icon">📷</span>
+        <span class="ph-label">[ Screenshot: Add Transaction — Edit / Delete ]</span>
+        <span class="ph-sub">Transaction logging with inline edit and delete controls</span>
+      </div>
+      <div class="img-placeholder h-60">
+        <span class="ph-icon">📷</span>
+        <span class="ph-label">[ Screenshot: Budget Predictor — Gauge ]</span>
+        <span class="ph-sub">Utilization gauge + proportional category allocation table</span>
+      </div>
+      <div class="img-placeholder h-60">
+        <span class="ph-icon">📷</span>
+        <span class="ph-label">[ Screenshot: AI Advisor Chatbot ]</span>
+        <span class="ph-sub">AI chatbot with data-driven financial responses and quick prompts</span>
+      </div>
+    </div>
+  </section>
 
-        <section id="methodology" class="space-y-12">
-            <h2 class="text-4xl font-black text-center uppercase tracking-tight">System <span class="text-blue-500">Methodology</span></h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="glass p-8 rounded-3xl text-center">
-                    <i class="fas fa-database text-blue-500 text-3xl mb-4"></i>
-                    <h3 class="font-bold mb-2 uppercase text-xs tracking-widest">Dataset / Input</h3>
-                    <ul class="text-sm text-slate-400 space-y-2 text-left">
-                        <li>• Structured financial dataset with 26,053 transaction records</li>
-                        <li>• 6 key features including categorical and numerical attributes</li>
-                        <li>• Attributes: City, Date, Card Type, Expense Type, Gender, Amount</li>
-                        <li>• No missing values ensuring data consistency</li>
-                        <li>• Preprocessing performed using Pandas & NumPy</li>
-                        <li>• Preprocessing: Data cleaning, encoding categorical variables, feature selection</li>
-                        <li>• Dataset used for training and evaluating XGBoost regression model</li>
-                    </ul>
-                </div>
-                <div class="glass p-8 rounded-3xl text-center">
-                    <i class="fas fa-microchip text-purple-500 text-3xl mb-4"></i>
-                    <h3 class="font-bold mb-2 uppercase text-xs tracking-widest">Model / Architecture</h3>
-                    <ul class="text-sm text-slate-500">
-                      <li>• Algorithm Used: XGBoost Regressor (Gradient Boosting Framework)</li>
-                      <li>• Sequential tree-based learning to minimize residual errors</li>
-                      <li>• Handles non-linear financial patterns effectively</li>
-                      <li>• Includes L1 & L2 regularization to prevent overfitting</li>  
-                      <li>• Performance evaluated using R² Score and error metrics</li>
-                    </ul>
-                    <div class="mt-4 flex flex-col items-center space-y-2 text-xs font-semibold text-white">
-                        <div class="bg-slate-800 px-3 py-1 rounded-lg text-center">
-                             Data Collection
-                        </div>
-                        <div class="text-blue-400">↓</div>
-                        <div class="bg-slate-800 px-3 py-1 rounded-lg text-center">
-                             Preprocessing
-                        </div>
-                        <div class="text-blue-400">↓</div>
-                        <div class="bg-slate-800 px-3 py-1 rounded-lg text-center">
-                             Train-Test Split
-                        </div>
-                        <div class="text-blue-400">↓</div>
-                        <div class="bg-slate-800 px-3 py-1 rounded-lg text-center">
-                             Model Training (XGBoost)
-                        </div>
-                        <div class="text-blue-400">↓</div>
-                        <div class="bg-slate-800 px-3 py-1 rounded-lg text-center">
-                             Evaluation
-                        </div>
-                        <div class="text-blue-400">↓</div>
-                        <div class="bg-green-600 px-3 py-1 rounded-lg text-center">
-                             Budget Prediction
-                        </div>
-                </div>
-                <div class="glass p-8 rounded-3xl text-center border-2 border-green-500/20 bg-green-500/5">
-                    <i class="fab fa-python text-green-500 text-3xl mb-4"></i>
-                    <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-green-400">Live Execution</h3>
-                    <a href="https://ai-based-personal-finance-tracker-and-budget-recommender-ghtd3.streamlit.app/" target="_blank" class="px-6 py-2 bg-green-600 rounded-full text-[10px] font-black hover:bg-green-500 transition shadow-lg shadow-green-900/40">VIEW CODE / DEMO</a>
-                </div>
-            </div>
-        </section>
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 7 · FUTURE SCOPE & CONCLUSION           -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section id="future">
+    <span class="label label-green">Future Scope & Conclusion</span>
+    <h2 class="text-4xl font-black mb-2">Future Scope</h2>
+    <h2 class="text-4xl font-black mb-10"><span class="grad-green">&amp; Conclusion</span></h2>
 
-    <section id="results" class="bg-slate-900 p-10 rounded-3xl">
-       <h2 class="text-3xl font-bold mb-8 text-center">
-            Results & Analysis
-        </h2>
-
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-            <div class="h-80">
-                <canvas id="resultsChart"></canvas>
-            </div>
-
-            <div>
-               <div class="p-6 rounded-xl bg-slate-800 mb-4">
-                    <span class="text-slate-400 uppercase text-xs">
-                        Model Performance
-                    </span>
-                    <div class="text-blue-400 text-3xl font-bold">
-                         R² Score: 0.91
-                    </div>
-                </div>
-
-                <p class="text-slate-400 text-sm">
-                    The XGBoost Regressor achieved high predictive accuracy by 
-                    sequentially minimizing residual errors. It effectively captures 
-                    non-linear financial patterns and generates personalized monthly budgets.
-                </p>
-            </div>
+    <!-- Future scope grid -->
+    <div class="grid md:grid-cols-3 gap-5 mb-12">
+      <div class="future-card border-blue-500/30 bg-blue-500/5">
+        <span class="text-2xl mt-0.5">🔄</span>
+        <div>
+          <p class="font-bold text-blue-300 text-sm mb-1">Real-time Integration</p>
+          <p class="text-xs text-slate-500">Live dashboard refresh with streaming budget predictions</p>
         </div>
-    </section>
-    <section class="bg-slate-900 p-8 rounded-3xl">
-        <h2 class="text-2xl font-bold text-center mb-6">
-           Future Scope
-        </h2>
-        <ul class="text-slate-400 text-sm space-y-2">
-           <li>• Real-time prediction integration with dashboard</li>
-           <li>• Larger dataset training for improved accuracy</li>
-           <li>• SHAP-based Explainable AI integration</li>
-           <li>• Banking API integration</li>
-        </ul>
-    </section>
+      </div>
+      <div class="future-card border-purple-500/30 bg-purple-500/5">
+        <span class="text-2xl mt-0.5">📡</span>
+        <div>
+          <p class="font-bold text-purple-300 text-sm mb-1">Banking API</p>
+          <p class="text-xs text-slate-500">Auto-import transactions from UPI &amp; bank APIs</p>
+        </div>
+      </div>
+      <div class="future-card border-amber-500/30 bg-amber-500/5">
+        <span class="text-2xl mt-0.5">🧠</span>
+        <div>
+          <p class="font-bold text-amber-300 text-sm mb-1">Explainable AI (SHAP)</p>
+          <p class="text-xs text-slate-500">Feature attribution for transparent budget decisions</p>
+        </div>
+      </div>
+      <div class="future-card border-green-500/30 bg-green-500/5">
+        <span class="text-2xl mt-0.5">📱</span>
+        <div>
+          <p class="font-bold text-green-300 text-sm mb-1">Mobile App</p>
+          <p class="text-xs text-slate-500">React Native / Flutter companion for on-the-go tracking</p>
+        </div>
+      </div>
+      <div class="future-card border-blue-500/30 bg-blue-500/5">
+        <span class="text-2xl mt-0.5">🗂</span>
+        <div>
+          <p class="font-bold text-blue-300 text-sm mb-1">Larger Dataset</p>
+          <p class="text-xs text-slate-500">Expand training data for improved cross-user accuracy</p>
+        </div>
+      </div>
+      <div class="future-card border-purple-500/30 bg-purple-500/5">
+        <span class="text-2xl mt-0.5">🔔</span>
+        <div>
+          <p class="font-bold text-purple-300 text-sm mb-1">Smart Alerts</p>
+          <p class="text-xs text-slate-500">Push notifications when approaching budget thresholds</p>
+        </div>
+      </div>
+    </div>
 
-        <section id="team" class="text-center pt-10 border-t border-slate-900">
-            <h2 class="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] mb-12">Academic Credits</h2>
-            <div class="flex flex-wrap justify-center gap-10">
-                <div class="glass px-12 py-8 rounded-[2rem] border-b-4 border-blue-600">
-                    <p class="text-[9px] font-bold text-blue-500 mb-2 uppercase tracking-widest">Project Guide</p>
-                    <p class="font-black text-xl text-slate-100">Mr. Vivek Singh Sikarwar</p>
-                </div>
-                <div class="glass px-12 py-8 rounded-[2rem] border-b-4 border-slate-700">
-                    <p class="text-[9px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Team Member 1</p>
-                    <p class="font-black text-xl text-slate-100">STUTI DIXIT</p>
-                    <p class="text-[10px] text-slate-500 mt-1">23FE10CSE00137</p>
-                </div>
-            </div>
-        </section>
-    </main>
+    <!-- Conclusion -->
+    <div class="card card-blue p-8 mb-10">
+      <h3 class="text-blue-400 font-bold text-sm uppercase tracking-widest mb-4">Conclusion</h3>
+      <p class="text-slate-400 leading-relaxed text-justify">
+        This project successfully delivers an AI-powered personal finance tracker integrating <strong class="text-white">XGBoost regression</strong> for budget prediction, interactive <strong class="text-white">Plotly visualizations</strong>, <strong class="text-white">Claude AI chatbot</strong> advisory, and a full CRUD transaction system with CSV export — all within a professional Streamlit web application. The system transforms reactive expense recording into a proactive, data-driven financial management experience, achieving an <strong class="text-white">R² score of 0.91</strong> with realistic user-anchored predictions.
+      </p>
+    </div>
 
-    <footer class="py-12 text-center bg-black/40 border-t border-slate-900">
-        <p class="text-slate-600 text-[10px] font-bold tracking-[0.3em] uppercase mb-2">Manipal University Jaipur</p>
-        <p class="text-slate-500 text-[9px] font-medium tracking-[0.2em] uppercase opacity-50">Department of Computer Science & Engineering • 2026</p>
-    </footer>
+    <!-- Live link -->
+    <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-5 text-center mb-10">
+      <p class="text-green-400 font-bold text-sm">
+        🔗 Live Demo: <a href="https://ai-based-personal-finance-tracker-and-budget-recommender-ghtd3.streamlit.app/" target="_blank" class="underline hover:text-green-300 transition">ai-based-personal-finance-tracker-and-budget-recommender-ghtd3.streamlit.app</a>
+      </p>
+    </div>
 
-    <script>
-        // TIMER LOGIC
-        let sec = 0;
-        let timer = null;
-        function startTimer() {
-            timer = setInterval(() => {
-                sec++;
-                let m = Math.floor(sec / 60);
-                let s = sec % 60;
-                document.getElementById('displayTime').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                
-                if (sec >= 480 && sec < 600) { // 8-10 Mins Warning
-                    document.getElementById('timerContainer').classList.add('timer-warning');
-                    document.getElementById('timerIcon').classList.replace('fa-hourglass-start', 'fa-hourglass-half');
-                } else if (sec >= 600) { // 10 Mins Stop
-                    clearInterval(timer);
-                    document.getElementById('timerContainer').classList.replace('timer-warning', 'timer-stop');
-                    document.getElementById('displayTime').innerText = "10:00";
-                    document.getElementById('timerIcon').classList.replace('fa-hourglass-half', 'fa-hourglass-end');
-                }
-            }, 1000);
-        }
+    <!-- Team credits -->
+    <div class="divider"></div>
+    <div class="flex flex-wrap justify-center gap-8 pt-4">
+      <div class="glass px-10 py-7 rounded-2xl border-b-4 border-blue-600 text-center">
+        <p class="text-[9px] font-bold text-blue-400 mb-1 uppercase tracking-widest">Project Guide</p>
+        <p class="font-black text-lg text-white">Mr. Vivek Singh Sikarwar</p>
+      </div>
+      <div class="glass px-10 py-7 rounded-2xl border-b-4 border-slate-700 text-center">
+        <p class="text-[9px] font-bold text-slate-400 mb-1 uppercase tracking-widest">Student</p>
+        <p class="font-black text-lg text-white">STUTI DIXIT</p>
+        <p class="text-[10px] text-slate-500 mt-1">23FE10CSE00137</p>
+      </div>
+    </div>
+  </section>
 
-        // RESULTS CHART (Demo Data)
-        const ctx = document.getElementById('resultsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Actual Spending', 'Predicted Budget'],
-                datasets: [{
-                    data: [85000, 92000],
-                    backgroundColor: ['#334155', '#3b82f6'],
-                    borderRadius: 15,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { beginAtZero: true}
-                }
-            }
-        });
-    </script>
+</main>
+
+<!-- ── FOOTER ──────────────────────────────────── -->
+<footer class="py-10 text-center bg-black/40 border-t border-slate-900">
+  <p class="text-slate-600 text-[10px] font-bold tracking-[.3em] uppercase mb-1">Manipal University Jaipur</p>
+  <p class="text-slate-500 text-[9px] tracking-[.2em] uppercase opacity-50">Department of Computer Science &amp; Engineering · 2026</p>
+</footer>
+
+<script>
+// ── TIMER ────────────────────────────────────────
+let sec = 0, timer = null;
+function startTimer() {
+  timer = setInterval(() => {
+    sec++;
+    const m = Math.floor(sec/60), s = sec%60;
+    document.getElementById('displayTime').innerText =
+      `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const tc = document.getElementById('timerContainer');
+    const ti = document.getElementById('timerIcon');
+    if (sec >= 480 && sec < 600) {
+      tc.classList.add('timer-warning');
+      ti.classList.replace('fa-hourglass-start','fa-hourglass-half');
+    } else if (sec >= 600) {
+      clearInterval(timer);
+      tc.classList.replace('timer-warning','timer-stop');
+      document.getElementById('displayTime').innerText = '10:00';
+      ti.classList.replace('fa-hourglass-half','fa-hourglass-end');
+    }
+  }, 1000);
+}
+
+// ── RESULTS CHART ────────────────────────────────
+const ctx = document.getElementById('resultsChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Food','Bills','Shopping','Travel','Grocery','Entertainment'],
+    datasets: [
+      {
+        label: 'Actual Spend',
+        data: [18000, 22000, 15000, 12000, 14000, 8000],
+        backgroundColor: '#3b82f6',
+        borderRadius: 8,
+      },
+      {
+        label: 'Budget Cap',
+        data: [20000, 24000, 14000, 13500, 15000, 7500],
+        backgroundColor: '#334155',
+        borderRadius: 8,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { color: '#94a3b8', font: { size: 11 } } }
+    },
+    scales: {
+      x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+      y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+    }
+  }
+});
+
+// ── INTERSECTION OBSERVER for fade-in ────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.card, .feat-card, .metric-box, .future-card, .img-placeholder, .stat-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity .5s ease, transform .5s ease';
+  obs.observe(el);
+});
+</script>
 </body>
 </html>
