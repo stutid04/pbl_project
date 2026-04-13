@@ -428,7 +428,6 @@
           <li>→ Secure signup &amp; login system</li>
           <li>→ SHA-256 password encryption</li>
           <li>→ Streamlit session management</li>
-          <li>→ User-scoped data isolation</li>
         </ul>
       </div>
 
@@ -442,7 +441,6 @@
           <li>→ Log income &amp; expenses</li>
           <li>→ 8 expense + 5 income categories</li>
           <li>→ Inline edit &amp; delete transactions</li>
-          <li>→ Export transactions as CSV</li>
         </ul>
       </div>
 
@@ -455,7 +453,6 @@
         <ul class="text-sm text-slate-400 space-y-2">
           <li>→ Ratio-based spend prediction</li>
           <li>→ Trained on 26,052 transactions</li>
-          <li>→ 0.8× – 1.5× safety bounds</li>
           <li>→ No dummy feature bias</li>
         </ul>
       </div>
@@ -467,7 +464,7 @@
         </div>
         <div class="divider" style="margin:.5rem 0 .8rem;"></div>
         <ul class="text-sm text-slate-400 space-y-2">
-          <li>→ Claude API integration</li>
+          <li>→ Gemini API integration</li>
           <li>→ Fully data-driven responses</li>
           <li>→ Rule-based fallback engine</li>
           <li>→ Quick-prompt shortcuts</li>
@@ -484,7 +481,7 @@
           <li>→ Income vs expense bar charts</li>
           <li>→ Expense breakdown donut</li>
           <li>→ Spending heatmap by day</li>
-          <li>→ Daily trend + 7-day MA</li>
+          <li>→ Daily trend graph </li>
         </ul>
       </div>
 
@@ -498,7 +495,6 @@
           <li>→ Proportional category caps</li>
           <li>→ Utilization gauge (0–150%)</li>
           <li>→ Over-budget alerts in red</li>
-          <li>→ Category variance table</li>
         </ul>
       </div>
     </div>
@@ -528,11 +524,6 @@
         <div class="text-xs font-bold text-white mt-1">ML Features</div>
         <div class="text-xs text-slate-500">Category + volume</div>
       </div>
-      <div class="metric-box border-amber-500/40 bg-amber-500/10">
-        <div class="stat-num text-amber-400" style="font-size:1.8rem">0.8–1.5×</div>
-        <div class="text-xs font-bold text-white mt-1">Prediction Range</div>
-        <div class="text-xs text-slate-500">Safety bounds</div>
-      </div>
     </div>
 
     <div class="grid md:grid-cols-2 gap-10 items-center">
@@ -549,12 +540,7 @@
             The XGBoost Regressor achieved high predictive accuracy by sequentially minimizing residual errors. It effectively captures non-linear financial patterns and generates personalized monthly budgets anchored to each user's own spending scale.
           </p>
         </div>
-        <!-- image placeholder -->
-        <div class="img-placeholder h-44">
-          <span class="ph-icon">📷</span>
-          <span class="ph-label">[ Screenshot: Budget Predictor — Gauge + Category Table ]</span>
-          <span class="ph-sub">Budget utilization gauge and proportional allocation breakdown</span>
-        </div>
+        
       </div>
     </div>
   </section>
@@ -650,13 +636,6 @@
       <h3 class="text-blue-400 font-bold text-sm uppercase tracking-widest mb-4">Conclusion</h3>
       <p class="text-slate-400 leading-relaxed text-justify">
         This project successfully delivers an AI-powered personal finance tracker integrating <strong class="text-white">XGBoost regression</strong> for budget prediction, interactive <strong class="text-white">Plotly visualizations</strong>, <strong class="text-white">Claude AI chatbot</strong> advisory, and a full CRUD transaction system with CSV export — all within a professional Streamlit web application. The system transforms reactive expense recording into a proactive, data-driven financial management experience, achieving an <strong class="text-white">R² score of 0.91</strong> with realistic user-anchored predictions.
-      </p>
-    </div>
-
-    <!-- Live link -->
-    <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-5 text-center mb-10">
-      <p class="text-green-400 font-bold text-sm">
-        🔗 Live Demo: <a href="https://ai-based-personal-finance-tracker-and-budget-recommender-ghtd3.streamlit.app/" target="_blank" class="underline hover:text-green-300 transition">ai-based-personal-finance-tracker-and-budget-recommender-ghtd3.streamlit.app</a>
       </p>
     </div>
 
